@@ -128,4 +128,74 @@ const join = joiner => (accu, cur) => accu + joiner + cur;
 [1, 2, 3, 4].reduce(join('/')) //'1/2/3/4'
 ```
 
+## Objects
+```
+//Not safe but dynamic. To share structure
+const person = {
+      firstname : "Florian",
+      lastname  : "Schnidrig",
+      getName   : function() {
+	        return this.firstname + " " + this.lastname
+      }
+};
+
+//safe and to share structure
+function Person(first, last) {
+         let firstname = first;
+         let lastname  = last;
+         return {
+	   getName : function() {
+	       return firstname + " " + lastname }
+	   }
+         }
+}
+
+//dynamic and instances can be changed via the prototype
+const Person = ( () => { // lexical scope
+      function Person(first, last) { // ctor, binding
+	     this.firstname  = first;
+	     this.lastname   = last;
+      }
+      Person.prototype.getName = function() {
+	   return this.firstname + " " + this.lastname;
+      };
+      return Person;
+}) ();
+//new Person("Florian", "Schnidrig") instanceof Person
+```
+
+## Class
+
+```
+class Person {
+      constructor(first, last) {
+          this.firstname = first;
+          this.lastname  = last
+      }
+      getName() {
+          return this.firstname + " " + this.lastname
+      }
+}
+// new Person("Florian", "Schnidrig") instanceof Person
+```
+
+```
+class Student extends Person {
+      constructor (first, last, grade) {
+          super(first, last); // never forget
+          this.grade = grade;
+      }
+}
+const s = new Student("Florian","Schnidrig", 5.5);
+```
+
+```
+//Prototype chain
+const s = new Student()
+// s.__proto__ === Student.prototype; //DO NOT EVEN THINK ABOUT IT!!!
+// Object.getPrototypeOf(s) === Student.prototype;
+// => s instanceof Student
+```
+
+
 

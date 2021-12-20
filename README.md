@@ -197,5 +197,140 @@ const s = new Student()
 // => s instanceof Student
 ```
 
+## Observable
+```
+const Observable = value => {
+	const listeners = []; // many
+	return {
+		onChange: callback => listeners.push(callback),
+		getValue: () => value,
+		setValue: val => {
+			if (value === val) return; // protection
+			// ordering
+            value = val;
+			listeners.forEach(notify => notify(val));
+		}
+	}
+};
+```
 
+## Callback, Events
+```
+function start() {
+	//...
+	window.onkeydown = evt => {
+		// doSomething();
+	};
+	setInterval(() => {
+		// doSomething();
+	}, 1000 / 5);
+}
+```
 
+## Promise
+```
+fetch ('http://fhnw.ch/json/students/list')
+.then(response => response.json())
+.then(students => console.log(students.length))
+.catch (err => console.log(err)
+Success / Failure callbacks:
+
+// definition
+const processEven = i => new Promise( (resolve, reject) => {
+	if (i % 2 === 0) {
+		resolve(i);
+	} else {
+		reject(i);
+	}
+});
+
+// use
+processEven(4)
+.then ( it => {console.log(it); return it} ) // auto promotion
+.then ( it => processEven(it+1))
+.catch( err => console.log( "Error: " + err))
+Async / Await
+const foo = async i => {
+	const x = await processEven(i).catch( err => err);
+	console.log("foo: " + x);
+};
+foo(4);
+```
+
+## Modules
+
+Modules help to organize the Code, make clear dependencies and avoid errors. (Globals, Scoping, Namespace)
+
+The following example of addinf js files to your page might nt work depending on the dependencies between each other:
+```
+<script src="fileA.js">
+<script src="fileB.js">
+<script src="fileC.js">
+// Won't work if fileA.js has a reference on fileC.js.
+```
+
+Makes it clear on how you want to edit the code and how you want the code to be delivered
+
+Do not confuse Modules with the following:
+
+Packages (they have versions)
+Dependencies, Libraries, Releases
+Units of publication
+Objects
+
+Modules are async
+```
+// Use URI format as follows: "./myFile.js"
+<script src="./myFile.js" type="module"> // type implies "defer"
+import ("./myFile.js").then( modules => ... )
+```
+### Import Variants
+(Always explicit!)
+
+```
+// most used
+import "module-name";
+import { export1, export2 } from "module-name";
+
+// other variants
+import defaultExport from "module-name";
+import * as name from "module-name";
+import { export } from "module-name";
+import { export as alias } from "module-name";
+var promise = import("module-name");
+```
+
+### Export Variants
+Always explicit!
+
+```
+// most used
+export { name1, name2, ... , nameN };
+
+// other variants
+export function FunctionName() { .. }
+export const name1, name2, ... , nameN; // or let
+export class ClassName { .. }
+export default expression;
+export { name1 as default, .. };
+export * from .. ;
+export { name1, name2, ... , nameN } from .. ;
+```
+
+### Impacts
+- implicit "use-strict" exports are read-only.
+- no Global object, no Global "this", no Global hoisting
+- implicit "defer" mode => document.writeln is no longer useful
+- Modules are Namespaces
+- Modules are Singletons
+
+### SOP - Same Origin Policy
+Modules are subject to the SOP
+Problem you might face at construction time: the File System is a null origin!
+
+Useful Tools to prevent this problem:
+- Developer Mode (suppress SOP) -> don't forget to set back!
+- Local Webserver
+- Disable cache!
+- Bundler (Rollup, Parcel, Webpack, ...)
+- Start Browser in Debug mode

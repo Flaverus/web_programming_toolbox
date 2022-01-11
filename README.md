@@ -301,7 +301,7 @@ var promise = import("module-name");
 ```
 
 ### Export Variants
-Always explicit!
+(Always explicit!)
 
 ```
 // most used
